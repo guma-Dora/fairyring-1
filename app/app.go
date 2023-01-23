@@ -107,6 +107,9 @@ import (
 	fairyringmodule "fairyring/x/fairyring"
 	fairyringmodulekeeper "fairyring/x/fairyring/keeper"
 	fairyringmoduletypes "fairyring/x/fairyring/types"
+	icqmodule "fairyring/x/icq"
+	icqmodulekeeper "fairyring/x/icq/keeper"
+	icqmoduletypes "fairyring/x/icq/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "fairyring/app/params"
@@ -166,6 +169,7 @@ var (
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		fairyringmodule.AppModuleBasic{},
+		icqmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -240,6 +244,8 @@ type App struct {
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
 	FairyringKeeper fairyringmodulekeeper.Keeper
+	ScopedIcqKeeper capabilitykeeper.ScopedKeeper
+	IcqKeeper       icqmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -285,6 +291,7 @@ func New(
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		icacontrollertypes.StoreKey,
 		fairyringmoduletypes.StoreKey,
+		icqmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -510,6 +517,20 @@ func New(
 	)
 	fairyringModule := fairyringmodule.NewAppModule(appCodec, app.FairyringKeeper, app.AccountKeeper, app.BankKeeper)
 
+	scopedIcqKeeper := app.CapabilityKeeper.ScopeToModule(icqmoduletypes.ModuleName)
+	app.ScopedIcqKeeper = scopedIcqKeeper
+	app.IcqKeeper = *icqmodulekeeper.NewKeeper(
+		appCodec,
+		keys[icqmoduletypes.StoreKey],
+		keys[icqmoduletypes.MemStoreKey],
+		app.GetSubspace(icqmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedIcqKeeper,
+	)
+	icqModule := icqmodule.NewAppModule(appCodec, app.IcqKeeper, app.AccountKeeper, app.BankKeeper)
+
+	icqIBCModule := icqmodule.NewIBCModule(app.IcqKeeper)
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Sealing prevents other modules from creating scoped sub-keepers
@@ -519,6 +540,7 @@ func New(
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(icqmoduletypes.ModuleName, icqIBCModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -556,6 +578,7 @@ func New(
 		transferModule,
 		icaModule,
 		fairyringModule,
+		icqModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -586,6 +609,7 @@ func New(
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		fairyringmoduletypes.ModuleName,
+		icqmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -611,6 +635,7 @@ func New(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		fairyringmoduletypes.ModuleName,
+		icqmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -641,6 +666,7 @@ func New(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		fairyringmoduletypes.ModuleName,
+		icqmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -671,6 +697,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		fairyringModule,
+		icqModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -870,6 +897,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(fairyringmoduletypes.ModuleName)
+	paramsKeeper.Subspace(icqmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

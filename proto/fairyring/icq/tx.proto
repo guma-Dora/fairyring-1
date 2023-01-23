@@ -1,0 +1,7 @@
+syntax = "proto3";
+package fairyring.icq;
+
+option go_package = "fairyring/x/icq/types";
+
+// Msg defines the Msg service.
+service Msg {}

@@ -1,0 +1,13 @@
+syntax = "proto3";
+package fairyring.icq;
+
+option go_package = "fairyring/x/icq/types";
+
+message IcqPacketData {
+    oneof packet {
+        NoData noData = 1;
+    }
+}
+
+message NoData {
+}

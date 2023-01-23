@@ -53,6 +53,13 @@ export interface QueryAllKeyShareResponse {
   pagination: PageResponse | undefined;
 }
 
+/** this line is used by starport scaffolding # 3 */
+export interface QueryFrBlocksRequest {
+}
+
+export interface QueryFrBlocksResponse {
+}
+
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -577,6 +584,84 @@ export const QueryAllKeyShareResponse = {
   },
 };
 
+function createBaseQueryFrBlocksRequest(): QueryFrBlocksRequest {
+  return {};
+}
+
+export const QueryFrBlocksRequest = {
+  encode(_: QueryFrBlocksRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFrBlocksRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFrBlocksRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryFrBlocksRequest {
+    return {};
+  },
+
+  toJSON(_: QueryFrBlocksRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryFrBlocksRequest>, I>>(_: I): QueryFrBlocksRequest {
+    const message = createBaseQueryFrBlocksRequest();
+    return message;
+  },
+};
+
+function createBaseQueryFrBlocksResponse(): QueryFrBlocksResponse {
+  return {};
+}
+
+export const QueryFrBlocksResponse = {
+  encode(_: QueryFrBlocksResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryFrBlocksResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFrBlocksResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryFrBlocksResponse {
+    return {};
+  },
+
+  toJSON(_: QueryFrBlocksResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryFrBlocksResponse>, I>>(_: I): QueryFrBlocksResponse {
+    const message = createBaseQueryFrBlocksResponse();
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -589,6 +674,8 @@ export interface Query {
   KeyShare(request: QueryGetKeyShareRequest): Promise<QueryGetKeyShareResponse>;
   /** Queries a list of KeyShare items. */
   KeyShareAll(request: QueryAllKeyShareRequest): Promise<QueryAllKeyShareResponse>;
+  /** Queries a list of FrBlocks items. */
+  FrBlocks(request: QueryFrBlocksRequest): Promise<QueryFrBlocksResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -600,6 +687,7 @@ export class QueryClientImpl implements Query {
     this.ValidatorSetAll = this.ValidatorSetAll.bind(this);
     this.KeyShare = this.KeyShare.bind(this);
     this.KeyShareAll = this.KeyShareAll.bind(this);
+    this.FrBlocks = this.FrBlocks.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
@@ -629,6 +717,12 @@ export class QueryClientImpl implements Query {
     const data = QueryAllKeyShareRequest.encode(request).finish();
     const promise = this.rpc.request("fairyring.fairyring.Query", "KeyShareAll", data);
     return promise.then((data) => QueryAllKeyShareResponse.decode(new _m0.Reader(data)));
+  }
+
+  FrBlocks(request: QueryFrBlocksRequest): Promise<QueryFrBlocksResponse> {
+    const data = QueryFrBlocksRequest.encode(request).finish();
+    const promise = this.rpc.request("fairyring.fairyring.Query", "FrBlocks", data);
+    return promise.then((data) => QueryFrBlocksResponse.decode(new _m0.Reader(data)));
   }
 }
 

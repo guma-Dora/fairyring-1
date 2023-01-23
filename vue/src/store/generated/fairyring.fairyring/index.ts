@@ -41,6 +41,7 @@ const getDefaultState = () => {
 				ValidatorSetAll: {},
 				KeyShare: {},
 				KeyShareAll: {},
+				FrBlocks: {},
 				
 				_Structure: {
 						KeyShare: getStructure(KeyShare.fromPartial({})),
@@ -103,6 +104,12 @@ export default {
 						(<any> params).query=null
 					}
 			return state.KeyShareAll[JSON.stringify(params)] ?? {}
+		},
+				getFrBlocks: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.FrBlocks[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -256,10 +263,33 @@ export default {
 		},
 		
 		
-		async sendMsgSendKeyshare({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		
+		 		
+		
+		
+		async QueryFrBlocks({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.FairyringFairyring.query.queryFrBlocks()).data
+				
+					
+				commit('QUERY', { query: 'FrBlocks', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFrBlocks', payload: { options: { all }, params: {...key},query }})
+				return getters['getFrBlocks']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryFrBlocks API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		async sendMsgSendKeyshare({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
-				const result = await client.FairyringFairyring.tx.sendMsgSendKeyshare({ value, fee: {amount: fee, gas: "200000"}, memo })
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.FairyringFairyring.tx.sendMsgSendKeyshare({ value, fee: fullFee, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
@@ -269,10 +299,11 @@ export default {
 				}
 			}
 		},
-		async sendMsgRegisterValidator({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgRegisterValidator({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
-				const result = await client.FairyringFairyring.tx.sendMsgRegisterValidator({ value, fee: {amount: fee, gas: "200000"}, memo })
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.FairyringFairyring.tx.sendMsgRegisterValidator({ value, fee: fullFee, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {

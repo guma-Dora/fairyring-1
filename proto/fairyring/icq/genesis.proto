@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package fairyring.icq;
+
+import "gogoproto/gogo.proto";
+import "fairyring/icq/params.proto";
+
+option go_package = "fairyring/x/icq/types";
+
+// GenesisState defines the icq module's genesis state.
+message GenesisState {
+  Params params  = 1 [(gogoproto.nullable) = false];
+  string port_id = 2;
+}
+

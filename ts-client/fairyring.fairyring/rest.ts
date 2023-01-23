@@ -73,6 +73,8 @@ export interface FairyringQueryAllValidatorSetResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export type FairyringQueryFrBlocksResponse = object;
+
 export interface FairyringQueryGetKeyShareResponse {
   keyShare?: FairyringKeyShare;
 }
@@ -303,6 +305,22 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFrBlocks
+   * @summary Queries a list of FrBlocks items.
+   * @request GET:/fairyring/fairyring/fr_blocks
+   */
+  queryFrBlocks = (params: RequestParams = {}) =>
+    this.request<FairyringQueryFrBlocksResponse, RpcStatus>({
+      path: `/fairyring/fairyring/fr_blocks`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

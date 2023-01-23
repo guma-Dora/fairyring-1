@@ -28,3 +28,8 @@ var (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
+
+// keys
+var (
+	CurrentHostInfoKey = []byte{0x11}
+)

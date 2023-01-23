@@ -1,4 +1,5 @@
 /* eslint-disable */
+import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Params } from "./params";
 
@@ -12,6 +13,13 @@ export interface QueryParamsRequest {
 export interface QueryParamsResponse {
   /** params holds all the parameters of this module. */
   params: Params | undefined;
+}
+
+export interface QueryHostHeightRequest {
+}
+
+export interface QueryHostHeightResponse {
+  height: number;
 }
 
 function createBaseQueryParamsRequest(): QueryParamsRequest {
@@ -102,10 +110,98 @@ export const QueryParamsResponse = {
   },
 };
 
+function createBaseQueryHostHeightRequest(): QueryHostHeightRequest {
+  return {};
+}
+
+export const QueryHostHeightRequest = {
+  encode(_: QueryHostHeightRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryHostHeightRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryHostHeightRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryHostHeightRequest {
+    return {};
+  },
+
+  toJSON(_: QueryHostHeightRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryHostHeightRequest>, I>>(_: I): QueryHostHeightRequest {
+    const message = createBaseQueryHostHeightRequest();
+    return message;
+  },
+};
+
+function createBaseQueryHostHeightResponse(): QueryHostHeightResponse {
+  return { height: 0 };
+}
+
+export const QueryHostHeightResponse = {
+  encode(message: QueryHostHeightResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.height !== 0) {
+      writer.uint32(8).uint64(message.height);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryHostHeightResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryHostHeightResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.height = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryHostHeightResponse {
+    return { height: isSet(object.height) ? Number(object.height) : 0 };
+  },
+
+  toJSON(message: QueryHostHeightResponse): unknown {
+    const obj: any = {};
+    message.height !== undefined && (obj.height = Math.round(message.height));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryHostHeightResponse>, I>>(object: I): QueryHostHeightResponse {
+    const message = createBaseQueryHostHeightResponse();
+    message.height = object.height ?? 0;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
+  /** Queries a list of HostHeight items. */
+  HostHeight(request: QueryHostHeightRequest): Promise<QueryHostHeightResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -113,17 +209,43 @@ export class QueryClientImpl implements Query {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
     this.Params = this.Params.bind(this);
+    this.HostHeight = this.HostHeight.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
     const promise = this.rpc.request("fairyring.icq.Query", "Params", data);
     return promise.then((data) => QueryParamsResponse.decode(new _m0.Reader(data)));
   }
+
+  HostHeight(request: QueryHostHeightRequest): Promise<QueryHostHeightResponse> {
+    const data = QueryHostHeightRequest.encode(request).finish();
+    const promise = this.rpc.request("fairyring.icq.Query", "HostHeight", data);
+    return promise.then((data) => QueryHostHeightResponse.decode(new _m0.Reader(data)));
+  }
 }
 
 interface Rpc {
   request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+declare var global: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
@@ -135,6 +257,18 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

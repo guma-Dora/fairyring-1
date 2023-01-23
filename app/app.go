@@ -110,6 +110,7 @@ import (
 	icqmodule "fairyring/x/icq"
 	icqmodulekeeper "fairyring/x/icq/keeper"
 	icqmoduletypes "fairyring/x/icq/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "fairyring/app/params"

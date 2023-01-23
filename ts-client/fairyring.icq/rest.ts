@@ -14,6 +14,11 @@
  */
 export type IcqParams = object;
 
+export interface IcqQueryHostHeightResponse {
+  /** @format uint64 */
+  height?: string;
+}
+
 /**
  * QueryParamsResponse is response type for the Query/Params RPC method.
  */
@@ -154,10 +159,26 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title fairyring/icq/genesis.proto
+ * @title fairyring/icq/current_host_info.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryHostHeight
+   * @summary Queries a list of HostHeight items.
+   * @request GET:/fairyring/icq/host_height
+   */
+  queryHostHeight = (params: RequestParams = {}) =>
+    this.request<IcqQueryHostHeightResponse, RpcStatus>({
+      path: `/fairyring/icq/host_height`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

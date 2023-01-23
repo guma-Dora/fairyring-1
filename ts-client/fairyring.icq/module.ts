@@ -8,6 +8,7 @@ import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
 
+import { CurrentHostInfo as typeCurrentHostInfo} from "./types"
 import { IcqPacketData as typeIcqPacketData} from "./types"
 import { NoData as typeNoData} from "./types"
 import { Params as typeParams} from "./types"
@@ -68,6 +69,7 @@ class SDKModule {
 		this.query = queryClient({ addr: client.env.apiURL });		
 		this.updateTX(client);
 		this.structure =  {
+						CurrentHostInfo: getStructure(typeCurrentHostInfo.fromPartial({})),
 						IcqPacketData: getStructure(typeIcqPacketData.fromPartial({})),
 						NoData: getStructure(typeNoData.fromPartial({})),
 						Params: getStructure(typeParams.fromPartial({})),

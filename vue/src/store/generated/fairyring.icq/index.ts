@@ -1,11 +1,12 @@
 import { Client, registry, MissingWalletError } from 'fairyring-client-ts'
 
+import { CurrentHostInfo } from "fairyring-client-ts/fairyring.icq/types"
 import { IcqPacketData } from "fairyring-client-ts/fairyring.icq/types"
 import { NoData } from "fairyring-client-ts/fairyring.icq/types"
 import { Params } from "fairyring-client-ts/fairyring.icq/types"
 
 
-export { IcqPacketData, NoData, Params };
+export { CurrentHostInfo, IcqPacketData, NoData, Params };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -37,8 +38,10 @@ function getStructure(template) {
 const getDefaultState = () => {
 	return {
 				Params: {},
+				HostHeight: {},
 				
 				_Structure: {
+						CurrentHostInfo: getStructure(CurrentHostInfo.fromPartial({})),
 						IcqPacketData: getStructure(IcqPacketData.fromPartial({})),
 						NoData: getStructure(NoData.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
@@ -75,6 +78,12 @@ export default {
 						(<any> params).query=null
 					}
 			return state.Params[JSON.stringify(params)] ?? {}
+		},
+				getHostHeight: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.HostHeight[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -127,6 +136,28 @@ export default {
 				return getters['getParams']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryParams API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryHostHeight({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.FairyringIcq.query.queryHostHeight()).data
+				
+					
+				commit('QUERY', { query: 'HostHeight', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryHostHeight', payload: { options: { all }, params: {...key},query }})
+				return getters['getHostHeight']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryHostHeight API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

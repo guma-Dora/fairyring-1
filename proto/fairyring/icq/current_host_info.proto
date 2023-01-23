@@ -1,0 +1,9 @@
+syntax = "proto3";
+package fairyring.icq;
+
+option go_package = "fairyring/x/icq/types";
+
+message CurrentHostInfo {
+  
+  uint64 height = 1; 
+}

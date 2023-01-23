@@ -7,11 +7,11 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	channeltypes "github.com/cosmos/ibc-go/v6/modules/core/04-channel/types"
-	host "github.com/cosmos/ibc-go/v6/modules/core/24-host"
-	"github.com/cosmos/ibc-go/v6/modules/core/exported"
+	channeltypes "github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
+	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 	"github.com/tendermint/tendermint/libs/log"
 
 	"fairyring/x/icq/types"
@@ -26,7 +26,7 @@ type (
 
 		channelKeeper types.ChannelKeeper
 		portKeeper    types.PortKeeper
-		scopedKeeper  exported.ScopedKeeper
+		scopedKeeper  capabilitykeeper.ScopedKeeper
 	}
 )
 
@@ -37,7 +37,7 @@ func NewKeeper(
 	ps paramtypes.Subspace,
 	channelKeeper types.ChannelKeeper,
 	portKeeper types.PortKeeper,
-	scopedKeeper exported.ScopedKeeper,
+	scopedKeeper capabilitykeeper.ScopedKeeper,
 
 ) *Keeper {
 	// set KeyTable if it has not already been set

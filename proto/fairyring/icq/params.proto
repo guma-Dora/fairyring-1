@@ -9,4 +9,5 @@ option go_package = "fairyring/x/icq/types";
 message Params {
   option (gogoproto.goproto_stringer) = false;
   string channelId = 1;
+  string portID = 2;
 }

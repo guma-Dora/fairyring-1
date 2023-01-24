@@ -34414,6 +34414,8 @@ paths:
                 properties:
                   channelId:
                     type: string
+                  portID:
+                    type: string
             description: >-
               QueryParamsResponse is response type for the Query/Params RPC
               method.
@@ -70381,6 +70383,8 @@ definitions:
     properties:
       channelId:
         type: string
+      portID:
+        type: string
     description: Params defines the parameters for the module.
   fairyring.icq.QueryHostHeightResponse:
     type: object
@@ -70396,6 +70400,8 @@ definitions:
         type: object
         properties:
           channelId:
+            type: string
+          portID:
             type: string
     description: QueryParamsResponse is response type for the Query/Params RPC method.
   ibc.applications.interchain_accounts.controller.v1.Params:

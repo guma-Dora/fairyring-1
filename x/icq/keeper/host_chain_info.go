@@ -37,16 +37,16 @@ func (k Keeper) SetCurrentHostChainInfo(ctx sdk.Context, hostInfo types.CurrentH
 }
 
 func (k Keeper) QueryHostChainInfo(ctx sdk.Context) (uint64, error) {
-	params := k.GetParams(ctx)
+	// params := k.GetParams(ctx)
 
-	chanCap, found := k.scopedKeeper.GetCapability(ctx, host.ChannelCapabilityPath(k.GetPort(ctx), params.ChannelId))
+	chanCap, found := k.scopedKeeper.GetCapability(ctx, host.ChannelCapabilityPath(k.GetPort(ctx), types.ChannelID))
 	if !found {
 		return 0, sdkerrors.Wrap(channeltypes.ErrChannelCapabilityNotFound, "module does not own channel capability")
 	}
 
-	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, types.PortID, params.ChannelId)
+	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, types.PortID, types.ChannelID)
 	if !found {
-		return 0, sdkerrors.Wrapf(channeltypes.ErrChannelNotFound, "port ID (%s) channel ID (%s)", types.PortID, params.ChannelId)
+		return 0, sdkerrors.Wrapf(channeltypes.ErrChannelNotFound, "port ID (%s) channel ID (%s)", types.PortID, types.ChannelID)
 	}
 
 	q := rpctypes.GetLatestBlockRequest{}
@@ -71,7 +71,7 @@ func (k Keeper) QueryHostChainInfo(ctx sdk.Context) (uint64, error) {
 
 	return k.createOutgoingPacket(ctx,
 		types.PortID,
-		params.ChannelId,
+		types.ChannelID,
 		destinationPort,
 		destinationChannel,
 		chanCap,

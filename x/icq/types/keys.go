@@ -20,7 +20,7 @@ const (
 	PortID = "icq"
 
 	// ChannelID is the default channel name
-	ChannelID = "channel-01"
+	ChannelID = "channel-0"
 )
 
 var (

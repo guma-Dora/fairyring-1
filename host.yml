@@ -1,31 +1,50 @@
+version: 1
+build:
+  proto:
+    path: proto
+    third_party_paths:
+    - third_party/proto
+    - proto_vendor
 accounts:
-  - name: alice
-    mnemonic: cruise scene law sea push expose scorpion wire trick repair wave quote task dose inner denial alpha favorite certain blouse motion flash split lunch
-    coins: ["20000000atom", "2000000000stake"]
-  - name: bob
-    mnemonic: lizard garlic canyon winner cheese tent drip task because ecology clay bridge junk critic track artefact gather harsh deliver unit vacant earth diesel stool
-    coins: ["10000000atom", "1000000000stake"]
-validator:
-  name: alice
-  staked: "100000000stake"
+- name: alice
+  coins:
+  - 20000000atom
+  - 2000000000stake
+  mnemonic: cruise scene law sea push expose scorpion wire trick repair wave quote
+    task dose inner denial alpha favorite certain blouse motion flash split lunch
+- name: bob
+  coins:
+  - 10000000atom
+  - 1000000000stake
+  mnemonic: lizard garlic canyon winner cheese tent drip task because ecology clay
+    bridge junk critic track artefact gather harsh deliver unit vacant earth diesel
+    stool
 faucet:
-  host: ":4501"
   name: bob
-  coins: ["1000000atom", "100000000stake"]
-host:
-  rpc: ":26559"
-  p2p: ":26662"
-  prof: ":6062"
-  grpc: ":9096"
-  grpc-web: ":8092"
-  api: ":1312"
-  frontend: ":8082"
-  dev-ui: ":12352"
+  coins:
+  - 1000000atom
+  - 100000000stake
+  host: :4501
 genesis:
-  chain_id: "host"
   app_state:
     interchainquery:
-        params:
-          allow_queries: /cosmos.base.tendermint.v1beta1.Service/GetLatestBlock"]
-init:
-  home: "$HOME/.host"
+      params:
+        allow_queries: /cosmos.base.tendermint.v1beta1.Service/GetLatestBlock"]
+  chain_id: host
+validators:
+- name: alice
+  bonded: 100000000stake
+  app:
+    api:
+      address: :1312
+    grpc:
+      address: :9096
+    grpc-web:
+      address: :8092
+  config:
+    p2p:
+      laddr: :26662
+    rpc:
+      laddr: :26559
+      pprof_laddr: :6062
+  home: $HOME/.host

@@ -3,16 +3,18 @@ package keeper
 import (
 	"errors"
 	"fairyring/x/icq/types"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 
+	rpctypes "github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	icqtypes "github.com/cosmos/ibc-go/v5/modules/apps/icq/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
 	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
-	tenderminttypes "github.com/tendermint/tendermint/types"
+	abcitypes "github.com/tendermint/tendermint/abci/types"
 )
 
 func (k Keeper) GetCurrentHostChainInfo(ctx sdk.Context) (currentHostInfo types.CurrentHostInfo, err error) {
@@ -34,27 +36,24 @@ func (k Keeper) SetCurrentHostChainInfo(ctx sdk.Context, hostInfo types.CurrentH
 	store.Set(key, b)
 }
 
-func (k Keeper) QueryHostChainInfo(
-	ctx sdk.Context,
-	chanCap *capabilitytypes.Capability,
-) (uint64, error) {
+func (k Keeper) QueryHostChainInfo(ctx sdk.Context) (uint64, error) {
 	params := k.GetParams(ctx)
 
-	chanCap, found := k.scopedKeeper.GetCapability(ctx, host.ChannelCapabilityPath(k.GetPort(ctx), msg.ChannelId))
+	chanCap, found := k.scopedKeeper.GetCapability(ctx, host.ChannelCapabilityPath(k.GetPort(ctx), params.ChannelId))
 	if !found {
 		return 0, sdkerrors.Wrap(channeltypes.ErrChannelCapabilityNotFound, "module does not own channel capability")
 	}
 
 	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, types.PortID, params.ChannelId)
 	if !found {
-		return 0, sdkerrors.Wrapf(channeltypes.ErrChannelNotFound, "port ID (%s) channel ID (%s)", sourcePort, sourceChannel)
+		return 0, sdkerrors.Wrapf(channeltypes.ErrChannelNotFound, "port ID (%s) channel ID (%s)", types.PortID, params.ChannelId)
 	}
 
-	q := tenderminttypes.Get
+	q := rpctypes.GetLatestBlockRequest{}
 
 	reqs := []abcitypes.RequestQuery{
 		{
-			Path: "/cosmos/base/tendermint/v1beta1/blocks/latest",
+			Path: "/cosmos.base.tendermint.v1beta1.Service/GetLatestBlock",
 			Data: k.cdc.MustMarshal(&q),
 		},
 	}
@@ -70,7 +69,13 @@ func (k Keeper) QueryHostChainInfo(
 		Data: data,
 	}
 
-	return k.createOutgoingPacket(ctx, sourcePort, sourceChannel, destinationPort, destinationChannel, chanCap, icqPacketData, timeoutTimestamp)
+	return k.createOutgoingPacket(ctx,
+		types.PortID,
+		params.ChannelId,
+		destinationPort,
+		destinationChannel,
+		chanCap,
+		icqPacketData)
 }
 
 func (k Keeper) createOutgoingPacket(
@@ -81,7 +86,6 @@ func (k Keeper) createOutgoingPacket(
 	destinationChannel string,
 	chanCap *capabilitytypes.Capability,
 	icqPacketData icqtypes.InterchainQueryPacketData,
-	timeoutTimestamp uint64,
 ) (uint64, error) {
 	if err := icqPacketData.ValidateBasic(); err != nil {
 		return 0, sdkerrors.Wrap(err, "invalid interchain query packet data")
@@ -93,6 +97,7 @@ func (k Keeper) createOutgoingPacket(
 		return 0, sdkerrors.Wrapf(channeltypes.ErrSequenceSendNotFound, "failed to retrieve next sequence send for channel %s on port %s", sourceChannel, sourcePort)
 	}
 
+	timeoutTimestamp := ctx.BlockTime().Add(time.Second * 5).UnixNano()
 	packet := channeltypes.NewPacket(
 		icqPacketData.GetBytes(),
 		sequence,
@@ -101,7 +106,7 @@ func (k Keeper) createOutgoingPacket(
 		destinationPort,
 		destinationChannel,
 		clienttypes.ZeroHeight(),
-		timeoutTimestamp,
+		uint64(timeoutTimestamp),
 	)
 
 	if err := k.channelKeeper.SendPacket(ctx, chanCap, packet); err != nil {
@@ -131,12 +136,13 @@ func (k Keeper) OnAcknowledgementPacket(
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "no responses in interchain query packet ack")
 		}
 
-		var r types.QueryHostHeightResponse
+		var r rpctypes.GetLatestBlockResponse
 		if err := k.cdc.Unmarshal(resps[0].Value, &r); err != nil {
 			return sdkerrors.Wrapf(err, "failed to unmarshal interchain query response to type %T", resp)
 		}
 
-		k.SetCurrentHostChainInfo(ctx, types.CurrentHostInfo(r))
+		latestHostBlock := r.GetBlock()
+		k.SetCurrentHostChainInfo(ctx, types.CurrentHostInfo{Height: uint64(latestHostBlock.Header.Height)})
 
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(

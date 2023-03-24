@@ -39,8 +39,6 @@ export interface FairblockFairblockNonce {
 
 export type FairblockMsgCreateAggregatedKeyShareResponse = object;
 
-export type FairblockMsgSendCurrentHeightResponse = object;
-
 export type FairblockMsgSubmitEncryptedTxResponse = object;
 
 /**

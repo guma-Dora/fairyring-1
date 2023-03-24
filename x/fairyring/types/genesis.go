@@ -14,6 +14,7 @@ func DefaultGenesis() *GenesisState {
 		KeyShareList:           []KeyShare{},
 		AggregatedKeyShareList: []AggregatedKeyShare{},
 		LatestPubKey:           LatestPubKey{},
+		TempAggKeyList:         []TempAggKey{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -51,6 +52,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for aggregatedKeyShare")
 		}
 		aggregatedKeyShareIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in tempAggKey
+	tempAggKeyIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.TempAggKeyList {
+		index := string(TempAggKeyKey(elem.Height))
+		if _, ok := tempAggKeyIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for tempAggKey")
+		}
+		tempAggKeyIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

@@ -5,15 +5,10 @@ import { EncryptedTx } from "fairyring-client-ts/fairyring.fairblock/types"
 import { EncryptedTxArray } from "fairyring-client-ts/fairyring.fairblock/types"
 import { FairblockExecutedNonce } from "fairyring-client-ts/fairyring.fairblock/types"
 import { FairblockNonce } from "fairyring-client-ts/fairyring.fairblock/types"
-import { FairblockTx } from "fairyring-client-ts/fairyring.fairblock/types"
-import { FairblockPacketData } from "fairyring-client-ts/fairyring.fairblock/types"
-import { NoData } from "fairyring-client-ts/fairyring.fairblock/types"
-import { CurrentHeightPacketData } from "fairyring-client-ts/fairyring.fairblock/types"
-import { CurrentHeightPacketAck } from "fairyring-client-ts/fairyring.fairblock/types"
 import { Params } from "fairyring-client-ts/fairyring.fairblock/types"
 
 
-export { AggregatedKeyShare, EncryptedTx, EncryptedTxArray, FairblockExecutedNonce, FairblockNonce, FairblockTx, FairblockPacketData, NoData, CurrentHeightPacketData, CurrentHeightPacketAck, Params };
+export { AggregatedKeyShare, EncryptedTx, EncryptedTxArray, FairblockExecutedNonce, FairblockNonce, Params };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -60,11 +55,6 @@ const getDefaultState = () => {
 						EncryptedTxArray: getStructure(EncryptedTxArray.fromPartial({})),
 						FairblockExecutedNonce: getStructure(FairblockExecutedNonce.fromPartial({})),
 						FairblockNonce: getStructure(FairblockNonce.fromPartial({})),
-						FairblockTx: getStructure(FairblockTx.fromPartial({})),
-						FairblockPacketData: getStructure(FairblockPacketData.fromPartial({})),
-						NoData: getStructure(NoData.fromPartial({})),
-						CurrentHeightPacketData: getStructure(CurrentHeightPacketData.fromPartial({})),
-						CurrentHeightPacketAck: getStructure(CurrentHeightPacketAck.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						
 		},
@@ -392,17 +382,17 @@ export default {
 		},
 		
 		
-		async sendMsgSendCurrentHeight({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+		async sendMsgCreateAggregatedKeyShare({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
 				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.FairyringFairblock.tx.sendMsgSendCurrentHeight({ value, fee: fullFee, memo })
+				const result = await client.FairyringFairblock.tx.sendMsgCreateAggregatedKeyShare({ value, fee: fullFee, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSendCurrentHeight:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSendCurrentHeight:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -420,31 +410,17 @@ export default {
 				}
 			}
 		},
-		async sendMsgCreateAggregatedKeyShare({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.FairyringFairblock.tx.sendMsgCreateAggregatedKeyShare({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		
-		async MsgSendCurrentHeight({ rootGetters }, { value }) {
+		async MsgCreateAggregatedKeyShare({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
-				const msg = await client.FairyringFairblock.tx.msgSendCurrentHeight({value})
+				const msg = await client.FairyringFairblock.tx.msgCreateAggregatedKeyShare({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSendCurrentHeight:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgSendCurrentHeight:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -458,19 +434,6 @@ export default {
 					throw new Error('TxClient:MsgSubmitEncryptedTx:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgSubmitEncryptedTx:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgCreateAggregatedKeyShare({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.FairyringFairblock.tx.msgCreateAggregatedKeyShare({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCreateAggregatedKeyShare:Create Could not create message: ' + e.message)
 				}
 			}
 		},

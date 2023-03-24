@@ -4,8 +4,9 @@ import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../cosmos/base/query/v1beta1/pagination";
 import { AggregatedKeyShare } from "./aggregated_key_share";
 import { KeyShare } from "./key_share";
+import { LatestPubKey } from "./latest_pub_key";
 import { Params } from "./params";
-import { PubKeyID } from "./pub_key_id";
+import { TempAggKey } from "./temp_agg_key";
 import { ValidatorSet } from "./validator_set";
 
 export const protobufPackage = "fairyring.fairyring";
@@ -73,20 +74,27 @@ export interface QueryAllAggregatedKeyShareResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetPubKeyIDRequest {
+export interface QueryLatestPubKeyRequest {
+}
+
+export interface QueryLatestPubKeyResponse {
+  latestPubKey: LatestPubKey | undefined;
+}
+
+export interface QueryGetTempAggKeyRequest {
   height: number;
 }
 
-export interface QueryGetPubKeyIDResponse {
-  pubKeyID: PubKeyID | undefined;
+export interface QueryGetTempAggKeyResponse {
+  tempAggKey: TempAggKey | undefined;
 }
 
-export interface QueryAllPubKeyIDRequest {
+export interface QueryAllTempAggKeyRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllPubKeyIDResponse {
-  pubKeyID: PubKeyID[];
+export interface QueryAllTempAggKeyResponse {
+  tempAggKey: TempAggKey[];
   pagination: PageResponse | undefined;
 }
 
@@ -841,22 +849,111 @@ export const QueryAllAggregatedKeyShareResponse = {
   },
 };
 
-function createBaseQueryGetPubKeyIDRequest(): QueryGetPubKeyIDRequest {
+function createBaseQueryLatestPubKeyRequest(): QueryLatestPubKeyRequest {
+  return {};
+}
+
+export const QueryLatestPubKeyRequest = {
+  encode(_: QueryLatestPubKeyRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryLatestPubKeyRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryLatestPubKeyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryLatestPubKeyRequest {
+    return {};
+  },
+
+  toJSON(_: QueryLatestPubKeyRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryLatestPubKeyRequest>, I>>(_: I): QueryLatestPubKeyRequest {
+    const message = createBaseQueryLatestPubKeyRequest();
+    return message;
+  },
+};
+
+function createBaseQueryLatestPubKeyResponse(): QueryLatestPubKeyResponse {
+  return { latestPubKey: undefined };
+}
+
+export const QueryLatestPubKeyResponse = {
+  encode(message: QueryLatestPubKeyResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.latestPubKey !== undefined) {
+      LatestPubKey.encode(message.latestPubKey, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryLatestPubKeyResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryLatestPubKeyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.latestPubKey = LatestPubKey.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryLatestPubKeyResponse {
+    return { latestPubKey: isSet(object.latestPubKey) ? LatestPubKey.fromJSON(object.latestPubKey) : undefined };
+  },
+
+  toJSON(message: QueryLatestPubKeyResponse): unknown {
+    const obj: any = {};
+    message.latestPubKey !== undefined
+      && (obj.latestPubKey = message.latestPubKey ? LatestPubKey.toJSON(message.latestPubKey) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryLatestPubKeyResponse>, I>>(object: I): QueryLatestPubKeyResponse {
+    const message = createBaseQueryLatestPubKeyResponse();
+    message.latestPubKey = (object.latestPubKey !== undefined && object.latestPubKey !== null)
+      ? LatestPubKey.fromPartial(object.latestPubKey)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryGetTempAggKeyRequest(): QueryGetTempAggKeyRequest {
   return { height: 0 };
 }
 
-export const QueryGetPubKeyIDRequest = {
-  encode(message: QueryGetPubKeyIDRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryGetTempAggKeyRequest = {
+  encode(message: QueryGetTempAggKeyRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.height !== 0) {
       writer.uint32(8).uint64(message.height);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetPubKeyIDRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetTempAggKeyRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetPubKeyIDRequest();
+    const message = createBaseQueryGetTempAggKeyRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -871,44 +968,44 @@ export const QueryGetPubKeyIDRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetPubKeyIDRequest {
+  fromJSON(object: any): QueryGetTempAggKeyRequest {
     return { height: isSet(object.height) ? Number(object.height) : 0 };
   },
 
-  toJSON(message: QueryGetPubKeyIDRequest): unknown {
+  toJSON(message: QueryGetTempAggKeyRequest): unknown {
     const obj: any = {};
     message.height !== undefined && (obj.height = Math.round(message.height));
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryGetPubKeyIDRequest>, I>>(object: I): QueryGetPubKeyIDRequest {
-    const message = createBaseQueryGetPubKeyIDRequest();
+  fromPartial<I extends Exact<DeepPartial<QueryGetTempAggKeyRequest>, I>>(object: I): QueryGetTempAggKeyRequest {
+    const message = createBaseQueryGetTempAggKeyRequest();
     message.height = object.height ?? 0;
     return message;
   },
 };
 
-function createBaseQueryGetPubKeyIDResponse(): QueryGetPubKeyIDResponse {
-  return { pubKeyID: undefined };
+function createBaseQueryGetTempAggKeyResponse(): QueryGetTempAggKeyResponse {
+  return { tempAggKey: undefined };
 }
 
-export const QueryGetPubKeyIDResponse = {
-  encode(message: QueryGetPubKeyIDResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.pubKeyID !== undefined) {
-      PubKeyID.encode(message.pubKeyID, writer.uint32(10).fork()).ldelim();
+export const QueryGetTempAggKeyResponse = {
+  encode(message: QueryGetTempAggKeyResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.tempAggKey !== undefined) {
+      TempAggKey.encode(message.tempAggKey, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetPubKeyIDResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetTempAggKeyResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetPubKeyIDResponse();
+    const message = createBaseQueryGetTempAggKeyResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.pubKeyID = PubKeyID.decode(reader, reader.uint32());
+          message.tempAggKey = TempAggKey.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -918,41 +1015,42 @@ export const QueryGetPubKeyIDResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetPubKeyIDResponse {
-    return { pubKeyID: isSet(object.pubKeyID) ? PubKeyID.fromJSON(object.pubKeyID) : undefined };
+  fromJSON(object: any): QueryGetTempAggKeyResponse {
+    return { tempAggKey: isSet(object.tempAggKey) ? TempAggKey.fromJSON(object.tempAggKey) : undefined };
   },
 
-  toJSON(message: QueryGetPubKeyIDResponse): unknown {
+  toJSON(message: QueryGetTempAggKeyResponse): unknown {
     const obj: any = {};
-    message.pubKeyID !== undefined && (obj.pubKeyID = message.pubKeyID ? PubKeyID.toJSON(message.pubKeyID) : undefined);
+    message.tempAggKey !== undefined
+      && (obj.tempAggKey = message.tempAggKey ? TempAggKey.toJSON(message.tempAggKey) : undefined);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryGetPubKeyIDResponse>, I>>(object: I): QueryGetPubKeyIDResponse {
-    const message = createBaseQueryGetPubKeyIDResponse();
-    message.pubKeyID = (object.pubKeyID !== undefined && object.pubKeyID !== null)
-      ? PubKeyID.fromPartial(object.pubKeyID)
+  fromPartial<I extends Exact<DeepPartial<QueryGetTempAggKeyResponse>, I>>(object: I): QueryGetTempAggKeyResponse {
+    const message = createBaseQueryGetTempAggKeyResponse();
+    message.tempAggKey = (object.tempAggKey !== undefined && object.tempAggKey !== null)
+      ? TempAggKey.fromPartial(object.tempAggKey)
       : undefined;
     return message;
   },
 };
 
-function createBaseQueryAllPubKeyIDRequest(): QueryAllPubKeyIDRequest {
+function createBaseQueryAllTempAggKeyRequest(): QueryAllTempAggKeyRequest {
   return { pagination: undefined };
 }
 
-export const QueryAllPubKeyIDRequest = {
-  encode(message: QueryAllPubKeyIDRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryAllTempAggKeyRequest = {
+  encode(message: QueryAllTempAggKeyRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllPubKeyIDRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllTempAggKeyRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryAllPubKeyIDRequest();
+    const message = createBaseQueryAllTempAggKeyRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -967,19 +1065,19 @@ export const QueryAllPubKeyIDRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllPubKeyIDRequest {
+  fromJSON(object: any): QueryAllTempAggKeyRequest {
     return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
   },
 
-  toJSON(message: QueryAllPubKeyIDRequest): unknown {
+  toJSON(message: QueryAllTempAggKeyRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined
       && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryAllPubKeyIDRequest>, I>>(object: I): QueryAllPubKeyIDRequest {
-    const message = createBaseQueryAllPubKeyIDRequest();
+  fromPartial<I extends Exact<DeepPartial<QueryAllTempAggKeyRequest>, I>>(object: I): QueryAllTempAggKeyRequest {
+    const message = createBaseQueryAllTempAggKeyRequest();
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
@@ -987,14 +1085,14 @@ export const QueryAllPubKeyIDRequest = {
   },
 };
 
-function createBaseQueryAllPubKeyIDResponse(): QueryAllPubKeyIDResponse {
-  return { pubKeyID: [], pagination: undefined };
+function createBaseQueryAllTempAggKeyResponse(): QueryAllTempAggKeyResponse {
+  return { tempAggKey: [], pagination: undefined };
 }
 
-export const QueryAllPubKeyIDResponse = {
-  encode(message: QueryAllPubKeyIDResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.pubKeyID) {
-      PubKeyID.encode(v!, writer.uint32(10).fork()).ldelim();
+export const QueryAllTempAggKeyResponse = {
+  encode(message: QueryAllTempAggKeyResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.tempAggKey) {
+      TempAggKey.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
@@ -1002,15 +1100,15 @@ export const QueryAllPubKeyIDResponse = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllPubKeyIDResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllTempAggKeyResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryAllPubKeyIDResponse();
+    const message = createBaseQueryAllTempAggKeyResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.pubKeyID.push(PubKeyID.decode(reader, reader.uint32()));
+          message.tempAggKey.push(TempAggKey.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -1023,28 +1121,28 @@ export const QueryAllPubKeyIDResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllPubKeyIDResponse {
+  fromJSON(object: any): QueryAllTempAggKeyResponse {
     return {
-      pubKeyID: Array.isArray(object?.pubKeyID) ? object.pubKeyID.map((e: any) => PubKeyID.fromJSON(e)) : [],
+      tempAggKey: Array.isArray(object?.tempAggKey) ? object.tempAggKey.map((e: any) => TempAggKey.fromJSON(e)) : [],
       pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
     };
   },
 
-  toJSON(message: QueryAllPubKeyIDResponse): unknown {
+  toJSON(message: QueryAllTempAggKeyResponse): unknown {
     const obj: any = {};
-    if (message.pubKeyID) {
-      obj.pubKeyID = message.pubKeyID.map((e) => e ? PubKeyID.toJSON(e) : undefined);
+    if (message.tempAggKey) {
+      obj.tempAggKey = message.tempAggKey.map((e) => e ? TempAggKey.toJSON(e) : undefined);
     } else {
-      obj.pubKeyID = [];
+      obj.tempAggKey = [];
     }
     message.pagination !== undefined
       && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryAllPubKeyIDResponse>, I>>(object: I): QueryAllPubKeyIDResponse {
-    const message = createBaseQueryAllPubKeyIDResponse();
-    message.pubKeyID = object.pubKeyID?.map((e) => PubKeyID.fromPartial(e)) || [];
+  fromPartial<I extends Exact<DeepPartial<QueryAllTempAggKeyResponse>, I>>(object: I): QueryAllTempAggKeyResponse {
+    const message = createBaseQueryAllTempAggKeyResponse();
+    message.tempAggKey = object.tempAggKey?.map((e) => TempAggKey.fromPartial(e)) || [];
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PageResponse.fromPartial(object.pagination)
       : undefined;
@@ -1067,9 +1165,11 @@ export interface Query {
   /** Queries a list of AggregatedKeyShare items. */
   AggregatedKeyShare(request: QueryGetAggregatedKeyShareRequest): Promise<QueryGetAggregatedKeyShareResponse>;
   AggregatedKeyShareAll(request: QueryAllAggregatedKeyShareRequest): Promise<QueryAllAggregatedKeyShareResponse>;
-  /** Queries a list of PubKeyID items. */
-  PubKeyID(request: QueryGetPubKeyIDRequest): Promise<QueryGetPubKeyIDResponse>;
-  PubKeyIDAll(request: QueryAllPubKeyIDRequest): Promise<QueryAllPubKeyIDResponse>;
+  /** Queries the latest public key. */
+  LatestPubKey(request: QueryLatestPubKeyRequest): Promise<QueryLatestPubKeyResponse>;
+  /** Queries a list of TempAggKey items. */
+  TempAggKey(request: QueryGetTempAggKeyRequest): Promise<QueryGetTempAggKeyResponse>;
+  TempAggKeyAll(request: QueryAllTempAggKeyRequest): Promise<QueryAllTempAggKeyResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1083,8 +1183,9 @@ export class QueryClientImpl implements Query {
     this.KeyShareAll = this.KeyShareAll.bind(this);
     this.AggregatedKeyShare = this.AggregatedKeyShare.bind(this);
     this.AggregatedKeyShareAll = this.AggregatedKeyShareAll.bind(this);
-    this.PubKeyID = this.PubKeyID.bind(this);
-    this.PubKeyIDAll = this.PubKeyIDAll.bind(this);
+    this.LatestPubKey = this.LatestPubKey.bind(this);
+    this.TempAggKey = this.TempAggKey.bind(this);
+    this.TempAggKeyAll = this.TempAggKeyAll.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
@@ -1128,16 +1229,22 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryAllAggregatedKeyShareResponse.decode(new _m0.Reader(data)));
   }
 
-  PubKeyID(request: QueryGetPubKeyIDRequest): Promise<QueryGetPubKeyIDResponse> {
-    const data = QueryGetPubKeyIDRequest.encode(request).finish();
-    const promise = this.rpc.request("fairyring.fairyring.Query", "PubKeyID", data);
-    return promise.then((data) => QueryGetPubKeyIDResponse.decode(new _m0.Reader(data)));
+  LatestPubKey(request: QueryLatestPubKeyRequest): Promise<QueryLatestPubKeyResponse> {
+    const data = QueryLatestPubKeyRequest.encode(request).finish();
+    const promise = this.rpc.request("fairyring.fairyring.Query", "LatestPubKey", data);
+    return promise.then((data) => QueryLatestPubKeyResponse.decode(new _m0.Reader(data)));
   }
 
-  PubKeyIDAll(request: QueryAllPubKeyIDRequest): Promise<QueryAllPubKeyIDResponse> {
-    const data = QueryAllPubKeyIDRequest.encode(request).finish();
-    const promise = this.rpc.request("fairyring.fairyring.Query", "PubKeyIDAll", data);
-    return promise.then((data) => QueryAllPubKeyIDResponse.decode(new _m0.Reader(data)));
+  TempAggKey(request: QueryGetTempAggKeyRequest): Promise<QueryGetTempAggKeyResponse> {
+    const data = QueryGetTempAggKeyRequest.encode(request).finish();
+    const promise = this.rpc.request("fairyring.fairyring.Query", "TempAggKey", data);
+    return promise.then((data) => QueryGetTempAggKeyResponse.decode(new _m0.Reader(data)));
+  }
+
+  TempAggKeyAll(request: QueryAllTempAggKeyRequest): Promise<QueryAllTempAggKeyResponse> {
+    const data = QueryAllTempAggKeyRequest.encode(request).finish();
+    const promise = this.rpc.request("fairyring.fairyring.Query", "TempAggKeyAll", data);
+    return promise.then((data) => QueryAllTempAggKeyResponse.decode(new _m0.Reader(data)));
   }
 }
 

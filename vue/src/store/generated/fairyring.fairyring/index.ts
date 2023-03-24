@@ -2,12 +2,13 @@ import { Client, registry, MissingWalletError } from 'fairyring-client-ts'
 
 import { AggregatedKeyShare } from "fairyring-client-ts/fairyring.fairyring/types"
 import { KeyShare } from "fairyring-client-ts/fairyring.fairyring/types"
+import { LatestPubKey } from "fairyring-client-ts/fairyring.fairyring/types"
 import { Params } from "fairyring-client-ts/fairyring.fairyring/types"
-import { PubKeyID } from "fairyring-client-ts/fairyring.fairyring/types"
+import { TempAggKey } from "fairyring-client-ts/fairyring.fairyring/types"
 import { ValidatorSet } from "fairyring-client-ts/fairyring.fairyring/types"
 
 
-export { AggregatedKeyShare, KeyShare, Params, PubKeyID, ValidatorSet };
+export { AggregatedKeyShare, KeyShare, LatestPubKey, Params, TempAggKey, ValidatorSet };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -45,14 +46,16 @@ const getDefaultState = () => {
 				KeyShareAll: {},
 				AggregatedKeyShare: {},
 				AggregatedKeyShareAll: {},
-				PubKeyID: {},
-				PubKeyIDAll: {},
+				LatestPubKey: {},
+				TempAggKey: {},
+				TempAggKeyAll: {},
 				
 				_Structure: {
 						AggregatedKeyShare: getStructure(AggregatedKeyShare.fromPartial({})),
 						KeyShare: getStructure(KeyShare.fromPartial({})),
+						LatestPubKey: getStructure(LatestPubKey.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
-						PubKeyID: getStructure(PubKeyID.fromPartial({})),
+						TempAggKey: getStructure(TempAggKey.fromPartial({})),
 						ValidatorSet: getStructure(ValidatorSet.fromPartial({})),
 						
 		},
@@ -124,17 +127,23 @@ export default {
 					}
 			return state.AggregatedKeyShareAll[JSON.stringify(params)] ?? {}
 		},
-				getPubKeyID: (state) => (params = { params: {}}) => {
+				getLatestPubKey: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.PubKeyID[JSON.stringify(params)] ?? {}
+			return state.LatestPubKey[JSON.stringify(params)] ?? {}
 		},
-				getPubKeyIDAll: (state) => (params = { params: {}}) => {
+				getTempAggKey: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.PubKeyIDAll[JSON.stringify(params)] ?? {}
+			return state.TempAggKey[JSON.stringify(params)] ?? {}
+		},
+				getTempAggKeyAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TempAggKeyAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -341,18 +350,18 @@ export default {
 		 		
 		
 		
-		async QueryPubKeyID({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLatestPubKey({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.FairyringFairyring.query.queryPubKeyID( key.height)).data
+				let value= (await client.FairyringFairyring.query.queryLatestPubKey()).data
 				
 					
-				commit('QUERY', { query: 'PubKeyID', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPubKeyID', payload: { options: { all }, params: {...key},query }})
-				return getters['getPubKeyID']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LatestPubKey', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLatestPubKey', payload: { options: { all }, params: {...key},query }})
+				return getters['getLatestPubKey']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryPubKeyID API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLatestPubKey API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -363,27 +372,63 @@ export default {
 		 		
 		
 		
-		async QueryPubKeyIDAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryTempAggKey({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.FairyringFairyring.query.queryPubKeyIDAll(query ?? undefined)).data
+				let value= (await client.FairyringFairyring.query.queryTempAggKey( key.height)).data
 				
 					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await client.FairyringFairyring.query.queryPubKeyIDAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'PubKeyIDAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPubKeyIDAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getPubKeyIDAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'TempAggKey', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTempAggKey', payload: { options: { all }, params: {...key},query }})
+				return getters['getTempAggKey']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryPubKeyIDAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryTempAggKey API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
 		
 		
+		
+		
+		 		
+		
+		
+		async QueryTempAggKeyAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.FairyringFairyring.query.queryTempAggKeyAll(query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.FairyringFairyring.query.queryTempAggKeyAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'TempAggKeyAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTempAggKeyAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getTempAggKeyAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryTempAggKeyAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		async sendMsgCreateLatestPubKey({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
+				const result = await client.FairyringFairyring.tx.sendMsgCreateLatestPubKey({ value, fee: fullFee, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreateLatestPubKey:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgCreateLatestPubKey:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgSendKeyshare({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -412,49 +457,20 @@ export default {
 				}
 			}
 		},
-		async sendMsgDeletePubKeyID({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.FairyringFairyring.tx.sendMsgDeletePubKeyID({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeletePubKeyID:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgDeletePubKeyID:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgUpdatePubKeyID({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.FairyringFairyring.tx.sendMsgUpdatePubKeyID({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgUpdatePubKeyID:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgUpdatePubKeyID:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgCreatePubKeyID({ rootGetters }, { value, fee = {amount: [], gas: "200000"}, memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const fullFee = Array.isArray(fee)  ? {amount: fee, gas: "200000"} :fee;
-				const result = await client.FairyringFairyring.tx.sendMsgCreatePubKeyID({ value, fee: fullFee, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreatePubKeyID:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCreatePubKeyID:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		
+		async MsgCreateLatestPubKey({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.FairyringFairyring.tx.msgCreateLatestPubKey({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreateLatestPubKey:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCreateLatestPubKey:Create Could not create message: ' + e.message)
+				}
+			}
+		},
 		async MsgSendKeyshare({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -478,45 +494,6 @@ export default {
 					throw new Error('TxClient:MsgRegisterValidator:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgRegisterValidator:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgDeletePubKeyID({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.FairyringFairyring.tx.msgDeletePubKeyID({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeletePubKeyID:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgDeletePubKeyID:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgUpdatePubKeyID({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.FairyringFairyring.tx.msgUpdatePubKeyID({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgUpdatePubKeyID:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgUpdatePubKeyID:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgCreatePubKeyID({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.FairyringFairyring.tx.msgCreatePubKeyID({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreatePubKeyID:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCreatePubKeyID:Create Could not create message: ' + e.message)
 				}
 			}
 		},

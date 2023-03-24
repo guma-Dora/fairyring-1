@@ -44,6 +44,14 @@ func TestGenesis(t *testing.T) {
 			"height",
 			"creator",
 		},
+		TempAggKeyList: []types.TempAggKey{
+			{
+				Height: 0,
+			},
+			{
+				Height: 1,
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -59,5 +67,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.KeyShareList, got.KeyShareList)
 	require.ElementsMatch(t, genesisState.AggregatedKeyShareList, got.AggregatedKeyShareList)
 	require.ElementsMatch(t, genesisState.LatestPubKey, got.LatestPubKey)
+	require.ElementsMatch(t, genesisState.TempAggKeyList, got.TempAggKeyList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

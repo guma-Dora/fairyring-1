@@ -7,26 +7,20 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
-import { MsgSendCurrentHeight } from "./types/fairyring/fairblock/tx";
-import { MsgSubmitEncryptedTx } from "./types/fairyring/fairblock/tx";
 import { MsgCreateAggregatedKeyShare } from "./types/fairyring/fairblock/tx";
+import { MsgSubmitEncryptedTx } from "./types/fairyring/fairblock/tx";
 
 import { AggregatedKeyShare as typeAggregatedKeyShare} from "./types"
 import { EncryptedTx as typeEncryptedTx} from "./types"
 import { EncryptedTxArray as typeEncryptedTxArray} from "./types"
 import { FairblockExecutedNonce as typeFairblockExecutedNonce} from "./types"
 import { FairblockNonce as typeFairblockNonce} from "./types"
-import { FairblockTx as typeFairblockTx} from "./types"
-import { FairblockPacketData as typeFairblockPacketData} from "./types"
-import { NoData as typeNoData} from "./types"
-import { CurrentHeightPacketData as typeCurrentHeightPacketData} from "./types"
-import { CurrentHeightPacketAck as typeCurrentHeightPacketAck} from "./types"
 import { Params as typeParams} from "./types"
 
-export { MsgSendCurrentHeight, MsgSubmitEncryptedTx, MsgCreateAggregatedKeyShare };
+export { MsgCreateAggregatedKeyShare, MsgSubmitEncryptedTx };
 
-type sendMsgSendCurrentHeightParams = {
-  value: MsgSendCurrentHeight,
+type sendMsgCreateAggregatedKeyShareParams = {
+  value: MsgCreateAggregatedKeyShare,
   fee?: StdFee,
   memo?: string
 };
@@ -37,23 +31,13 @@ type sendMsgSubmitEncryptedTxParams = {
   memo?: string
 };
 
-type sendMsgCreateAggregatedKeyShareParams = {
+
+type msgCreateAggregatedKeyShareParams = {
   value: MsgCreateAggregatedKeyShare,
-  fee?: StdFee,
-  memo?: string
-};
-
-
-type msgSendCurrentHeightParams = {
-  value: MsgSendCurrentHeight,
 };
 
 type msgSubmitEncryptedTxParams = {
   value: MsgSubmitEncryptedTx,
-};
-
-type msgCreateAggregatedKeyShareParams = {
-  value: MsgCreateAggregatedKeyShare,
 };
 
 
@@ -86,17 +70,17 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
-		async sendMsgSendCurrentHeight({ value, fee, memo }: sendMsgSendCurrentHeightParams): Promise<DeliverTxResponse> {
+		async sendMsgCreateAggregatedKeyShare({ value, fee, memo }: sendMsgCreateAggregatedKeyShareParams): Promise<DeliverTxResponse> {
 			if (!signer) {
-					throw new Error('TxClient:sendMsgSendCurrentHeight: Unable to sign Tx. Signer is not present.')
+					throw new Error('TxClient:sendMsgCreateAggregatedKeyShare: Unable to sign Tx. Signer is not present.')
 			}
 			try {			
 				const { address } = (await signer.getAccounts())[0]; 
 				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgSendCurrentHeight({ value: MsgSendCurrentHeight.fromPartial(value) })
+				let msg = this.msgCreateAggregatedKeyShare({ value: MsgCreateAggregatedKeyShare.fromPartial(value) })
 				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:sendMsgSendCurrentHeight: Could not broadcast Tx: '+ e.message)
+				throw new Error('TxClient:sendMsgCreateAggregatedKeyShare: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
@@ -114,26 +98,12 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		async sendMsgCreateAggregatedKeyShare({ value, fee, memo }: sendMsgCreateAggregatedKeyShareParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgCreateAggregatedKeyShare: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgCreateAggregatedKeyShare({ value: MsgCreateAggregatedKeyShare.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgCreateAggregatedKeyShare: Could not broadcast Tx: '+ e.message)
-			}
-		},
 		
-		
-		msgSendCurrentHeight({ value }: msgSendCurrentHeightParams): EncodeObject {
+		msgCreateAggregatedKeyShare({ value }: msgCreateAggregatedKeyShareParams): EncodeObject {
 			try {
-				return { typeUrl: "/fairyring.fairblock.MsgSendCurrentHeight", value: MsgSendCurrentHeight.fromPartial( value ) }  
+				return { typeUrl: "/fairyring.fairblock.MsgCreateAggregatedKeyShare", value: MsgCreateAggregatedKeyShare.fromPartial( value ) }  
 			} catch (e: any) {
-				throw new Error('TxClient:MsgSendCurrentHeight: Could not create message: ' + e.message)
+				throw new Error('TxClient:MsgCreateAggregatedKeyShare: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -142,14 +112,6 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 				return { typeUrl: "/fairyring.fairblock.MsgSubmitEncryptedTx", value: MsgSubmitEncryptedTx.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgSubmitEncryptedTx: Could not create message: ' + e.message)
-			}
-		},
-		
-		msgCreateAggregatedKeyShare({ value }: msgCreateAggregatedKeyShareParams): EncodeObject {
-			try {
-				return { typeUrl: "/fairyring.fairblock.MsgCreateAggregatedKeyShare", value: MsgCreateAggregatedKeyShare.fromPartial( value ) }  
-			} catch (e: any) {
-				throw new Error('TxClient:MsgCreateAggregatedKeyShare: Could not create message: ' + e.message)
 			}
 		},
 		
@@ -180,11 +142,6 @@ class SDKModule {
 						EncryptedTxArray: getStructure(typeEncryptedTxArray.fromPartial({})),
 						FairblockExecutedNonce: getStructure(typeFairblockExecutedNonce.fromPartial({})),
 						FairblockNonce: getStructure(typeFairblockNonce.fromPartial({})),
-						FairblockTx: getStructure(typeFairblockTx.fromPartial({})),
-						FairblockPacketData: getStructure(typeFairblockPacketData.fromPartial({})),
-						NoData: getStructure(typeNoData.fromPartial({})),
-						CurrentHeightPacketData: getStructure(typeCurrentHeightPacketData.fromPartial({})),
-						CurrentHeightPacketAck: getStructure(typeCurrentHeightPacketAck.fromPartial({})),
 						Params: getStructure(typeParams.fromPartial({})),
 						
 		};

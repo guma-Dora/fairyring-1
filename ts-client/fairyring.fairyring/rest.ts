@@ -33,9 +33,12 @@ export interface FairyringKeyShare {
   receivedBlockHeight?: string;
 }
 
-export type FairyringMsgCreatePubKeyIDResponse = object;
+export interface FairyringLatestPubKey {
+  publicKey?: string;
+  creator?: string;
+}
 
-export type FairyringMsgDeletePubKeyIDResponse = object;
+export type FairyringMsgCreateLatestPubKeyResponse = object;
 
 export interface FairyringMsgRegisterValidatorResponse {
   creator?: string;
@@ -56,20 +59,10 @@ export interface FairyringMsgSendKeyshareResponse {
   receivedBlockHeight?: string;
 }
 
-export type FairyringMsgUpdatePubKeyIDResponse = object;
-
 /**
  * Params defines the parameters for the module.
  */
 export type FairyringParams = object;
-
-export interface FairyringPubKeyID {
-  /** @format uint64 */
-  height?: string;
-  publicKey?: string;
-  ibeID?: string;
-  creator?: string;
-}
 
 export interface FairyringQueryAllAggregatedKeyShareResponse {
   aggregatedKeyShare?: FairyringAggregatedKeyShare[];
@@ -101,8 +94,8 @@ export interface FairyringQueryAllKeyShareResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface FairyringQueryAllPubKeyIDResponse {
-  pubKeyID?: FairyringPubKeyID[];
+export interface FairyringQueryAllTempAggKeyResponse {
+  tempAggKey?: FairyringTempAggKey[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -139,12 +132,16 @@ export interface FairyringQueryGetKeyShareResponse {
   keyShare?: FairyringKeyShare;
 }
 
-export interface FairyringQueryGetPubKeyIDResponse {
-  pubKeyID?: FairyringPubKeyID;
+export interface FairyringQueryGetTempAggKeyResponse {
+  tempAggKey?: FairyringTempAggKey;
 }
 
 export interface FairyringQueryGetValidatorSetResponse {
   validatorSet?: FairyringValidatorSet;
+}
+
+export interface FairyringQueryLatestPubKeyResponse {
+  latestPubKey?: FairyringLatestPubKey;
 }
 
 /**
@@ -153,6 +150,12 @@ export interface FairyringQueryGetValidatorSetResponse {
 export interface FairyringQueryParamsResponse {
   /** params holds all the parameters of this module. */
   params?: FairyringParams;
+}
+
+export interface FairyringTempAggKey {
+  /** @format uint64 */
+  height?: string;
+  data?: string;
 }
 
 export interface FairyringValidatorSet {
@@ -456,6 +459,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryLatestPubKey
+   * @summary Queries the latest public key.
+   * @request GET:/fairyring/fairyring/latest_pub_key
+   */
+  queryLatestPubKey = (params: RequestParams = {}) =>
+    this.request<FairyringQueryLatestPubKeyResponse, RpcStatus>({
+      path: `/fairyring/fairyring/latest_pub_key`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryParams
    * @summary Parameters queries the parameters of the module.
    * @request GET:/fairyring/fairyring/params
@@ -472,10 +491,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryPubKeyIdAll
-   * @request GET:/fairyring/fairyring/pub_key_id
+   * @name QueryTempAggKeyAll
+   * @request GET:/fairyring/fairyring/temp_agg_key
    */
-  queryPubKeyIDAll = (
+  queryTempAggKeyAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -485,8 +504,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<FairyringQueryAllPubKeyIDResponse, RpcStatus>({
-      path: `/fairyring/fairyring/pub_key_id`,
+    this.request<FairyringQueryAllTempAggKeyResponse, RpcStatus>({
+      path: `/fairyring/fairyring/temp_agg_key`,
       method: "GET",
       query: query,
       format: "json",
@@ -497,13 +516,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryPubKeyId
-   * @summary Queries a list of PubKeyID items.
-   * @request GET:/fairyring/fairyring/pub_key_id/{height}
+   * @name QueryTempAggKey
+   * @summary Queries a list of TempAggKey items.
+   * @request GET:/fairyring/fairyring/temp_agg_key/{height}
    */
-  queryPubKeyID = (height: string, params: RequestParams = {}) =>
-    this.request<FairyringQueryGetPubKeyIDResponse, RpcStatus>({
-      path: `/fairyring/fairyring/pub_key_id/${height}`,
+  queryTempAggKey = (height: string, params: RequestParams = {}) =>
+    this.request<FairyringQueryGetTempAggKeyResponse, RpcStatus>({
+      path: `/fairyring/fairyring/temp_agg_key/${height}`,
       method: "GET",
       format: "json",
       ...params,

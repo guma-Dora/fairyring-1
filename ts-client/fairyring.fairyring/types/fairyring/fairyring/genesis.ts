@@ -2,8 +2,9 @@
 import _m0 from "protobufjs/minimal";
 import { AggregatedKeyShare } from "./aggregated_key_share";
 import { KeyShare } from "./key_share";
+import { LatestPubKey } from "./latest_pub_key";
 import { Params } from "./params";
-import { PubKeyID } from "./pub_key_id";
+import { TempAggKey } from "./temp_agg_key";
 import { ValidatorSet } from "./validator_set";
 
 export const protobufPackage = "fairyring.fairyring";
@@ -15,11 +16,19 @@ export interface GenesisState {
   keyShareList: KeyShare[];
   /** this line is used by starport scaffolding # genesis/proto/state */
   aggregatedKeyShareList: AggregatedKeyShare[];
-  pubKeyIDList: PubKeyID[];
+  LatestPubKey: LatestPubKey | undefined;
+  tempAggKeyList: TempAggKey[];
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, validatorSetList: [], keyShareList: [], aggregatedKeyShareList: [], pubKeyIDList: [] };
+  return {
+    params: undefined,
+    validatorSetList: [],
+    keyShareList: [],
+    aggregatedKeyShareList: [],
+    LatestPubKey: undefined,
+    tempAggKeyList: [],
+  };
 }
 
 export const GenesisState = {
@@ -36,8 +45,11 @@ export const GenesisState = {
     for (const v of message.aggregatedKeyShareList) {
       AggregatedKeyShare.encode(v!, writer.uint32(34).fork()).ldelim();
     }
-    for (const v of message.pubKeyIDList) {
-      PubKeyID.encode(v!, writer.uint32(42).fork()).ldelim();
+    if (message.LatestPubKey !== undefined) {
+      LatestPubKey.encode(message.LatestPubKey, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.tempAggKeyList) {
+      TempAggKey.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -62,7 +74,10 @@ export const GenesisState = {
           message.aggregatedKeyShareList.push(AggregatedKeyShare.decode(reader, reader.uint32()));
           break;
         case 5:
-          message.pubKeyIDList.push(PubKeyID.decode(reader, reader.uint32()));
+          message.LatestPubKey = LatestPubKey.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.tempAggKeyList.push(TempAggKey.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -84,8 +99,9 @@ export const GenesisState = {
       aggregatedKeyShareList: Array.isArray(object?.aggregatedKeyShareList)
         ? object.aggregatedKeyShareList.map((e: any) => AggregatedKeyShare.fromJSON(e))
         : [],
-      pubKeyIDList: Array.isArray(object?.pubKeyIDList)
-        ? object.pubKeyIDList.map((e: any) => PubKeyID.fromJSON(e))
+      LatestPubKey: isSet(object.LatestPubKey) ? LatestPubKey.fromJSON(object.LatestPubKey) : undefined,
+      tempAggKeyList: Array.isArray(object?.tempAggKeyList)
+        ? object.tempAggKeyList.map((e: any) => TempAggKey.fromJSON(e))
         : [],
     };
   },
@@ -110,10 +126,12 @@ export const GenesisState = {
     } else {
       obj.aggregatedKeyShareList = [];
     }
-    if (message.pubKeyIDList) {
-      obj.pubKeyIDList = message.pubKeyIDList.map((e) => e ? PubKeyID.toJSON(e) : undefined);
+    message.LatestPubKey !== undefined
+      && (obj.LatestPubKey = message.LatestPubKey ? LatestPubKey.toJSON(message.LatestPubKey) : undefined);
+    if (message.tempAggKeyList) {
+      obj.tempAggKeyList = message.tempAggKeyList.map((e) => e ? TempAggKey.toJSON(e) : undefined);
     } else {
-      obj.pubKeyIDList = [];
+      obj.tempAggKeyList = [];
     }
     return obj;
   },
@@ -126,7 +144,10 @@ export const GenesisState = {
     message.validatorSetList = object.validatorSetList?.map((e) => ValidatorSet.fromPartial(e)) || [];
     message.keyShareList = object.keyShareList?.map((e) => KeyShare.fromPartial(e)) || [];
     message.aggregatedKeyShareList = object.aggregatedKeyShareList?.map((e) => AggregatedKeyShare.fromPartial(e)) || [];
-    message.pubKeyIDList = object.pubKeyIDList?.map((e) => PubKeyID.fromPartial(e)) || [];
+    message.LatestPubKey = (object.LatestPubKey !== undefined && object.LatestPubKey !== null)
+      ? LatestPubKey.fromPartial(object.LatestPubKey)
+      : undefined;
+    message.tempAggKeyList = object.tempAggKeyList?.map((e) => TempAggKey.fromPartial(e)) || [];
     return message;
   },
 };

@@ -10,6 +10,7 @@ import "fairyring/fairyring/validator_set.proto";
 import "fairyring/fairyring/key_share.proto";
 import "fairyring/fairyring/aggregated_key_share.proto";
 import "fairyring/fairyring/latest_pub_key.proto";
+import "fairyring/fairyring/temp_agg_key.proto";
 
 // this line is used by starport scaffolding # 1
 
@@ -61,8 +62,18 @@ service Query {
   }
   
   // Queries the latest public key.
-  rpc LatestPubKey    (QueryLatestPubKeyRequest) returns (QueryLatestPubKeyResponse) {
+  rpc LatestPubKey (QueryLatestPubKeyRequest) returns (QueryLatestPubKeyResponse) {
     option (google.api.http).get = "/fairyring/fairyring/latest_pub_key";
+  
+  }
+  
+  // Queries a list of TempAggKey items.
+  rpc TempAggKey    (QueryGetTempAggKeyRequest) returns (QueryGetTempAggKeyResponse) {
+    option (google.api.http).get = "/fairyring/fairyring/temp_agg_key/{height}";
+  
+  }
+  rpc TempAggKeyAll (QueryAllTempAggKeyRequest) returns (QueryAllTempAggKeyResponse) {
+    option (google.api.http).get = "/fairyring/fairyring/temp_agg_key";
   
   }
 }
@@ -132,6 +143,23 @@ message QueryAllAggregatedKeyShareResponse {
 message QueryLatestPubKeyRequest {}
 
 message QueryLatestPubKeyResponse {
-  LatestPubKey                               latestPubKey   = 1 [(gogoproto.nullable) = false];
+  LatestPubKey latestPubKey = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetTempAggKeyRequest {
+  uint64 height = 1;
+}
+
+message QueryGetTempAggKeyResponse {
+  TempAggKey tempAggKey = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTempAggKeyRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTempAggKeyResponse {
+  repeated TempAggKey                             tempAggKey = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

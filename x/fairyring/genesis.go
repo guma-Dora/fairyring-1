@@ -22,6 +22,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	}
 	// Set latest public key
 	k.SetLatestPubKey(ctx, genState.LatestPubKey)
+	// Set all the tempAggKey
+	for _, elem := range genState.TempAggKeyList {
+		k.SetTempAggKey(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -39,6 +43,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 		genesis.LatestPubKey = pkey
 	}
 
+	genesis.TempAggKeyList = k.GetAllTempAggKey(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis
